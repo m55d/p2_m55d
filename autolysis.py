@@ -66,6 +66,62 @@ plt.suptitle("Histograms of Numeric Columns")
 plt.savefig('histograms.png')  # Save as PNG
 plt.close()
 
+
+# Generate Narrative Insights using OpenAI LLM
+def generate_story(insights):
+    prompt = f"Analyze the following insights from a dataset and write a detailed storytelling report:\n{insights}"
+    response = openai.ChatCompletion.create(
+        model="GPT-4o-Mini",  # or "gpt-3.5-turbo"
+        messages=[
+            {"role": "system", "content": "You are a data storytelling expert."},
+            {"role": "user", "content": prompt},
+        ],
+        temperature=0.7,
+    )
+    return response["choices"][0]["message"]["content"]
+
+# Combine insights into a single text
+insights = f"""
+Summary Statistics:
+{summary_stats.to_string()}
+
+Missing Values:
+{missing_values.to_string()}
+
+Outliers Detected:
+{outliers.to_string()}
+
+Correlation Matrix:
+{correlation_matrix.to_string() if correlation_matrix is not None else 'Not Available'}
+"""
+narrative = generate_story(insights)
+
+# Save the LLM-generated narrative to a markdown file
+with open("LLM_Report.md", "w") as file:
+    file.write("# LLM-Generated Report\n\n")
+    file.write(narrative)
+
+# Analyze Text Data (if available)
+text_columns = df.select_dtypes(include=['object']).dropna()
+if not text_columns.empty:
+    def summarize_text(text_column):
+        prompt = f"Summarize the following reviews:\n{text_column.to_string()[:4000]}"  # Limit to 4000 chars
+        response = openai.ChatCompletion.create(
+            model="GPT-4o-Mini",
+            messages=[
+                {"role": "system", "content": "You are an expert in text summarization."},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.7,
+        )
+        return response["choices"][0]["message"]["content"]
+
+    for column in text_columns.columns:
+        text_summary = summarize_text(text_columns[column])
+        with open(f"summary_{column}.txt", "w") as file:
+            file.write(f"Summary of {column}:\n\n{text_summary}")
+
+
 # # Visualization 3: Clustering result - Scatter plot of the first two numeric columns
 # plt.figure(figsize=(8, 6))
 # sns.scatterplot(x=df_numeric.iloc[:, 0], y=df_numeric.iloc[:, 1], hue='Cluster', palette='Set1')
