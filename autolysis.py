@@ -6,6 +6,12 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.cluster import KMeans
 import numpy as np
 from scipy import stats
+import openai
+
+# Set OpenAI API Key
+openai.api_base = "https://aiproxy.sanand.workers.dev/openai/v1"
+openai.api_key = "eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIyZjMwMDAyMzJAZHMuc3R1ZHkuaWl0bS5hYy5pbiJ9.f3-QmDAJOy6xG0QcKXRiP0Q4N3Irc5WIZI6x-UgvDAI"  # Replace with your OpenAI API key
+
 
 # Set the token directly
 os.environ["AIPROXY_TOKEN"] = "eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjIyZjMwMDAyMzJAZHMuc3R1ZHkuaWl0bS5hYy5pbiJ9.f3-QmDAJOy6xG0QcKXRiP0Q4N3Irc5WIZI6x-UgvDAI"
